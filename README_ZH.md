@@ -21,8 +21,31 @@
 ## 前置要求
 
 - Java 21+
-- Pandoc (`brew install pandoc`)
+- Pandoc（用于 Word 文档转换）
 - Node.js（用于前端开发）
+
+### 安装 Pandoc
+
+**macOS**
+```bash
+brew install pandoc
+```
+
+**Ubuntu/Debian**
+```bash
+sudo apt install pandoc
+```
+
+**Windows**
+```powershell
+winget install pandoc
+# 或从 https://pandoc.org/installing.html 下载安装包
+```
+
+**验证安装**
+```bash
+pandoc --version
+```
 
 ## 快速开始
 

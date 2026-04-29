@@ -21,8 +21,31 @@ A document format conversion tool that converts Word/PDF exam documents to clean
 ## Prerequisites
 
 - Java 21+
-- Pandoc (`brew install pandoc`)
+- Pandoc (for Word document conversion)
 - Node.js (for frontend development)
+
+### Install Pandoc
+
+**macOS**
+```bash
+brew install pandoc
+```
+
+**Ubuntu/Debian**
+```bash
+sudo apt install pandoc
+```
+
+**Windows**
+```powershell
+winget install pandoc
+# or download installer from https://pandoc.org/installing.html
+```
+
+**Verify**
+```bash
+pandoc --version
+```
 
 ## Getting Started
 
