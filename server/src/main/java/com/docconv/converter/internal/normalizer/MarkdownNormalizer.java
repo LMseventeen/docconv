@@ -546,7 +546,8 @@ public class MarkdownNormalizer {
         text = HTML_COMMENT.matcher(text).replaceAll("");
         text = PANDOC_CLASS_ATTR.matcher(text).replaceAll("");
         text = PANDOC_ANCHOR_SPAN.matcher(text).replaceAll("");
-        text = PANDOC_IMAGE.matcher(text).replaceAll("<!-- image removed -->");
+        // 保留图片引用，不移除
+        // text = PANDOC_IMAGE.matcher(text).replaceAll("<!-- image removed -->");
         text = PANDOC_NEWPAGE.matcher(text).replaceAll("");
         text = RAW_HTML_BLOCK.matcher(text).replaceAll("");
         text = UNNECESSARY_ESCAPE.matcher(text).replaceAll("$1");
