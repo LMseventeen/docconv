@@ -1,0 +1,18 @@
+# Gradle
+server/build/
+server/.gradle/
+
+# Nuxt
+web/.nuxt/
+web/node_modules/
+web/dist/
+
+# IDE
+.idea/
+*.iml
+
+# OS
+.DS_Store
+
+# Environment
+.env
