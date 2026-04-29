@@ -16,3 +16,4 @@ web/dist/
 
 # Environment
 .env
+web/.output/
