@@ -1,5 +1,8 @@
 package com.docconv.converter.internal.service;
 
+import com.docconv.ai.dto.AIRiskRequest;
+import com.docconv.ai.dto.AIRiskResponse;
+import com.docconv.ai.service.AIRiskService;
 import com.docconv.converter.ConvertService;
 import com.docconv.converter.dto.ConvertDocumentParseResult;
 import com.docconv.converter.dto.UploadFile;
@@ -17,24 +20,35 @@ public class ConvertServiceImpl implements ConvertService {
 
     private final DocumentParser documentParser;
     private final MarkdownNormalizer normalizer;
+    private final AIRiskService aiRiskService;
 
     @Override
     public ConvertDocumentParseResult convert(UploadFile document) {
         validateFile(document);
 
+        String format = detectSourceFormat(document.getFilename());
         log.info("Converting file: {} ({} bytes)", document.getFilename(), document.getSize());
 
         // Parse: extract raw content from document format
         var parseResult = documentParser.parse(document);
 
         // Normalize: clean and structure the Markdown
-        String markdown = normalizer.normalize(parseResult.getContent(), detectSourceFormat(document.getFilename()));
+        String markdown = normalizer.normalize(parseResult.getContent(), format);
+
+        // AI processing: fix structure, normalize math, annotate risks
+        AIRiskResponse aiResult = aiRiskService.process(
+                AIRiskRequest.builder()
+                        .content(markdown)
+                        .sourceFormat(format)
+                        .build()
+        );
 
         // Build result
         var result = new ConvertDocumentParseResult();
-        result.setContent(markdown);
+        result.setContent(aiResult.getContent());
+        result.setRiskSeverity(aiResult.getOverallSeverity());
 
-        log.info("Conversion complete: length={}", markdown.length());
+        log.info("Conversion complete: length={}, risk={}", aiResult.getContent().length(), aiResult.getOverallSeverity());
         return result;
     }
 

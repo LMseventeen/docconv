@@ -67,7 +67,7 @@ public class MarkdownNormalizer {
     private static final Pattern PANDOC_IMAGE = Pattern.compile("!\\[.*?\\]\\(.*?\\)");
     private static final Pattern PANDOC_NEWPAGE = Pattern.compile("\\\\newpage");
     private static final Pattern RAW_HTML_BLOCK =
-        Pattern.compile("</?(?:div|span|table|tr|td|th|tbody|thead|p)[^>]*>", Pattern.CASE_INSENSITIVE);
+        Pattern.compile("</?(?:div|span|table|tr|td|th|tbody|thead|p|br)[^>]*>", Pattern.CASE_INSENSITIVE);
     private static final Pattern UNNECESSARY_ESCAPE = Pattern.compile("\\\\([^\\w\\s*#\\[\\]()`{}>~_+\\-=!|\\\\])");
 
     // ---- Phase 7: Whitespace ----
@@ -148,6 +148,12 @@ public class MarkdownNormalizer {
 
         // Convert tabs to 2 spaces
         text = text.replace("\t", "  ");
+
+        // Decode common HTML entities and remove HTML tags
+        text = text.replaceAll("&lt;", "<");
+        text = text.replaceAll("&gt;", ">");
+        text = text.replaceAll("&amp;", "&");
+        text = text.replaceAll("&quot;", "\"");
 
         return text;
     }
@@ -550,6 +556,10 @@ public class MarkdownNormalizer {
         // text = PANDOC_IMAGE.matcher(text).replaceAll("<!-- image removed -->");
         text = PANDOC_NEWPAGE.matcher(text).replaceAll("");
         text = RAW_HTML_BLOCK.matcher(text).replaceAll("");
+        // Remove <br> tags (case-insensitive) and convert to newline
+        text = text.replaceAll("(?i)<br\\s*/?>", "\n");
+        // Also handle HTML entities for br
+        text = text.replaceAll("(?i)&lt;br\\s*/?&gt;", "\n");
         text = UNNECESSARY_ESCAPE.matcher(text).replaceAll("$1");
         return text;
     }
@@ -560,6 +570,9 @@ public class MarkdownNormalizer {
         text = TRAILING_WHITESPACE.matcher(text).replaceAll("");
         text = MULTIPLE_BLANK_LINES.matcher(text).replaceAll("\n\n");
         text = removePageBreakMarkers(text);
+        // Final cleanup: remove any remaining <br> tags
+        text = text.replaceAll("(?i)<br\\s*/?>", "\n");
+        text = text.replaceAll("(?i)&lt;br\\s*/?&gt;", "\n");
         text = text.strip();
         return text;
     }

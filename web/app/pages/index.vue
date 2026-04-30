@@ -1,18 +1,32 @@
 <script setup lang="ts">
+import { ref, computed } from 'vue'
 import { useConvert } from '~/composables/useConvert'
+import MarkdownIt from 'markdown-it'
 
 const {
   state,
   markdown,
   errorMessage,
   fileName,
-  convertFile,
+  isStreaming,
+  convertFileStream,
   downloadMarkdown,
   reset
 } = useConvert()
 
+const md = new MarkdownIt({
+  html: false,
+  linkify: true,
+  typographer: true
+})
+
+const renderedHtml = computed(() => {
+  if (!markdown.value) return ''
+  return md.render(markdown.value)
+})
+
 function handleFileSelect(file: File) {
-  convertFile(file)
+  convertFileStream(file)
 }
 </script>
 
@@ -41,20 +55,17 @@ function handleFileSelect(file: File) {
         </div>
       </div>
 
-      <!-- Uploading / Converting state: show progress -->
-      <div v-if="state === 'uploading' || state === 'converting'" class="progress-section">
+      <!-- Uploading state: show progress -->
+      <div v-if="state === 'uploading'" class="progress-section">
         <div class="progress-card">
           <div class="spinner" />
-          <p class="progress-text">
-            <template v-if="state === 'uploading'">Uploading {{ fileName }}...</template>
-            <template v-else>Converting {{ fileName }}...</template>
-          </p>
+          <p class="progress-text">Uploading {{ fileName }}...</p>
           <p class="progress-hint">This may take a few seconds for large documents</p>
         </div>
       </div>
 
-      <!-- Preview state: show markdown -->
-      <div v-if="state === 'preview'" class="preview-section">
+      <!-- Converting/Preview state: show streaming content -->
+      <div v-if="state === 'converting' || state === 'preview'" class="preview-section">
         <div class="preview-toolbar">
           <div class="toolbar-left">
             <button class="back-btn" @click="reset">
@@ -65,10 +76,25 @@ function handleFileSelect(file: File) {
               Convert another
             </button>
             <span class="file-name">{{ fileName }}</span>
+            <span v-if="isStreaming" class="streaming-badge">
+              <span class="streaming-dot"></span>
+              AI Processing...
+            </span>
           </div>
           <DownloadButton :file-name="fileName" @download="downloadMarkdown" />
         </div>
-        <MarkdownPreview :markdown="markdown" />
+
+        <!-- Live streaming preview -->
+        <div class="preview-container">
+          <div class="preview-header">
+            <span class="preview-label">Markdown Preview</span>
+          </div>
+          <div v-if="state === 'converting' && !markdown" class="converting-indicator">
+            <div class="spinner-small" />
+            <span>AI is processing the document...</span>
+          </div>
+          <div v-else class="preview-body markdown-body" v-html="renderedHtml" />
+        </div>
       </div>
     </main>
   </div>
@@ -105,7 +131,6 @@ function handleFileSelect(file: File) {
   padding: 0 1.5rem 3rem;
 }
 
-/* Upload section */
 .upload-section {
   display: flex;
   flex-direction: column;
@@ -141,7 +166,6 @@ function handleFileSelect(file: File) {
   background: #b91c1c;
 }
 
-/* Progress section */
 .progress-section {
   display: flex;
   justify-content: center;
@@ -182,7 +206,6 @@ function handleFileSelect(file: File) {
   margin: 0;
 }
 
-/* Preview section */
 .preview-section {
   display: flex;
   flex-direction: column;
@@ -227,5 +250,177 @@ function handleFileSelect(file: File) {
   font-size: 0.875rem;
   color: #6b7280;
   font-weight: 500;
+}
+
+.streaming-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  background: #ede9fe;
+  color: #6366f1;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.streaming-dot {
+  width: 6px;
+  height: 6px;
+  background: #6366f1;
+  border-radius: 50%;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.converting-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: #f5f3ff;
+  border: 1px solid #e0e7ff;
+  border-radius: 8px;
+  color: #6366f1;
+  font-size: 0.875rem;
+}
+
+.spinner-small {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #e0e7ff;
+  border-top-color: #6366f1;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.preview-container {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+  background: white;
+}
+
+.preview-header {
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 0.75rem 1rem;
+}
+
+.preview-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.preview-body {
+  padding: 1.5rem;
+  max-height: 70vh;
+  overflow-y: auto;
+  font-size: 0.9375rem;
+  line-height: 1.7;
+}
+
+.markdown-body :deep(h1) {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 1.5rem 0 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.markdown-body :deep(h2) {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 1.25rem 0 0.5rem;
+}
+
+.markdown-body :deep(h3) {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 1rem 0 0.5rem;
+}
+
+.markdown-body :deep(h4) {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0.75rem 0 0.5rem;
+}
+
+.markdown-body :deep(p) {
+  margin: 0.5rem 0;
+}
+
+.markdown-body :deep(ul),
+.markdown-body :deep(ol) {
+  padding-left: 1.5rem;
+  margin: 0.5rem 0;
+}
+
+.markdown-body :deep(li) {
+  margin: 0.25rem 0;
+}
+
+.markdown-body :deep(table) {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1rem 0;
+}
+
+.markdown-body :deep(th),
+.markdown-body :deep(td) {
+  border: 1px solid #e5e7eb;
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+}
+
+.markdown-body :deep(th) {
+  background: #f9fafb;
+  font-weight: 600;
+}
+
+.markdown-body :deep(code) {
+  background: #f3f4f6;
+  padding: 0.125rem 0.375rem;
+  border-radius: 4px;
+  font-size: 0.875em;
+}
+
+.markdown-body :deep(pre) {
+  background: #1f2937;
+  color: #e5e7eb;
+  padding: 1rem;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 1rem 0;
+}
+
+.markdown-body :deep(pre code) {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+.markdown-body :deep(blockquote) {
+  border-left: 4px solid #6366f1;
+  padding-left: 1rem;
+  margin: 0.75rem 0;
+  color: #6b7280;
+}
+
+.markdown-body :deep(hr) {
+  border: none;
+  border-top: 1px solid #e5e7eb;
+  margin: 1.5rem 0;
+}
+
+.markdown-body :deep(strong) {
+  font-weight: 600;
 }
 </style>

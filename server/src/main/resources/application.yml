@@ -13,3 +13,8 @@ docconv:
     timeout-seconds: 30
   storage:
     temp-dir: ${java.io.tmpdir}/docconv
+  deepseek:
+    api-url: ${DEEPSEEK_API_URL:https://api.deepseek.com/chat/completions}
+    api-key: ${DEEPSEEK_API_KEY:}
+    model: ${DEEPSEEK_MODEL:deepseek-v4-pro}
+    timeout-seconds: ${DEEPSEEK_TIMEOUT:120}

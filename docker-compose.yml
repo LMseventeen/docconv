@@ -1,0 +1,46 @@
+services:
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: docconv-backend
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    networks:
+      - docconv-network
+
+  frontend:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    container_name: docconv-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NUXT_PUBLIC_API_BASE=http://backend:8080
+      - NUXT_API_PROXY_TARGET=http://backend:8080/api/**
+    restart: unless-stopped
+    networks:
+      - docconv-network
+    depends_on:
+      - backend
+
+  nginx:
+    image: nginx:alpine
+    container_name: docconv-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    restart: unless-stopped
+    networks:
+      - docconv-network
+    depends_on:
+      - backend
+      - frontend
+
+networks:
+  docconv-network:
+    driver: bridge
