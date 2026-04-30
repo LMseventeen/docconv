@@ -1,6 +1,6 @@
 package com.docconv.ai.exception;
 
-import com.docconv.converter.support.exception.ErrorCode;
+import com.docconv.support.exception.ErrorCode;
 
 public class AIErrorCode {
 

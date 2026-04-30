@@ -1,4 +1,4 @@
-package com.docconv.converter.support.process;
+package com.docconv.support.process;
 
 import org.slf4j.Logger;
 

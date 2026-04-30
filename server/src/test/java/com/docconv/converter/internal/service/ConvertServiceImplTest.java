@@ -1,12 +1,15 @@
 package com.docconv.converter.internal.service;
 
+import com.docconv.ai.dto.AIRiskRequest;
+import com.docconv.ai.dto.AIRiskResponse;
+import com.docconv.ai.service.AIRiskService;
 import com.docconv.converter.dto.ConvertDocumentParseResult;
 import com.docconv.converter.dto.UploadFile;
 import com.docconv.converter.internal.normalizer.MarkdownNormalizer;
 import com.docconv.converter.internal.support.documentparser.DocumentParser;
 import com.docconv.converter.internal.support.documentparser.PdfParser;
 import com.docconv.converter.internal.support.documentparser.WordParser;
-import com.docconv.converter.support.exception.AppException;
+import com.docconv.support.exception.AppException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -26,7 +29,8 @@ class ConvertServiceImplTest {
         StubPdfParser stubPdfParser = new StubPdfParser();
         DocumentParser documentParser = new DocumentParser(stubWordParser, stubPdfParser);
         MarkdownNormalizer normalizer = new MarkdownNormalizer();
-        convertService = new ConvertServiceImpl(documentParser, normalizer);
+        StubAIRiskService stubAIRiskService = new StubAIRiskService();
+        convertService = new ConvertServiceImpl(documentParser, normalizer, stubAIRiskService);
     }
 
     @Test
@@ -117,6 +121,21 @@ class ConvertServiceImplTest {
             var result = new ConvertDocumentParseResult();
             result.setContent("# Test Title\n\nThis is test content.");
             return result;
+        }
+    }
+
+    /** Stub AI Risk Service that returns the input content unchanged. */
+    private static class StubAIRiskService extends AIRiskService {
+        StubAIRiskService() {
+            super(null);
+        }
+
+        @Override
+        public AIRiskResponse process(AIRiskRequest request) {
+            return AIRiskResponse.builder()
+                    .content(request.getContent())
+                    .overallSeverity("none")
+                    .build();
         }
     }
 }

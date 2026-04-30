@@ -2,7 +2,7 @@ package com.docconv.converter.internal.support.documentparser;
 
 import com.docconv.converter.dto.ConvertDocumentParseResult;
 import com.docconv.converter.dto.UploadFile;
-import com.docconv.converter.support.exception.Errors;
+import com.docconv.support.exception.Errors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

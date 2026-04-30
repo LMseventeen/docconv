@@ -2,8 +2,9 @@ package com.docconv.converter.internal.support.documentparser;
 
 import com.docconv.converter.dto.ConvertDocumentParseResult;
 import com.docconv.converter.dto.UploadFile;
-import com.docconv.converter.support.exception.Errors;
-import com.docconv.converter.support.kit.FileKit;
+import com.docconv.support.exception.AppException;
+import com.docconv.support.exception.Errors;
+import com.docconv.support.kit.FileKit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.opendataloader.pdf.api.Config;
@@ -52,7 +53,7 @@ public class PdfParser implements IDocumentParser {
             result.setContent(content);
             return result;
         } catch (Exception e) {
-            if (e instanceof com.docconv.converter.support.exception.AppException) {
+            if (e instanceof AppException) {
                 throw (RuntimeException) e;
             }
             throw Errors.PARSER_EXECUTION_ERROR.toException(e, "PDF 解析失败: {}", e.getMessage());

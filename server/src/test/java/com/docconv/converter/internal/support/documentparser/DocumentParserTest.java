@@ -2,7 +2,7 @@ package com.docconv.converter.internal.support.documentparser;
 
 import com.docconv.converter.dto.ConvertDocumentParseResult;
 import com.docconv.converter.dto.UploadFile;
-import com.docconv.converter.support.exception.AppException;
+import com.docconv.support.exception.AppException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

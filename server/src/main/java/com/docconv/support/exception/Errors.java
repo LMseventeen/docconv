@@ -1,4 +1,4 @@
-package com.docconv.converter.support.exception;
+package com.docconv.support.exception;
 
 public class Errors {
 

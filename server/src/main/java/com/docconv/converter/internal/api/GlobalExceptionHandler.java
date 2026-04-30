@@ -1,7 +1,7 @@
 package com.docconv.converter.internal.api;
 
 import com.docconv.converter.dto.ErrorResponse;
-import com.docconv.converter.support.exception.AppException;
+import com.docconv.support.exception.AppException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

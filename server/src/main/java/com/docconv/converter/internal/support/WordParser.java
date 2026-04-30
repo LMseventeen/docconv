@@ -9,9 +9,9 @@ import java.util.ArrayList;
 import com.docconv.converter.config.PandocConfig;
 import com.docconv.converter.dto.ConvertDocumentParseResult;
 import com.docconv.converter.dto.UploadFile;
-import com.docconv.converter.support.exception.Errors;
-import com.docconv.converter.support.kit.FileKit;
-import com.docconv.converter.support.process.CommandExecutor;
+import com.docconv.support.exception.Errors;
+import com.docconv.support.kit.FileKit;
+import com.docconv.support.process.CommandExecutor;
 
 import cn.hutool.core.io.FileUtil;
 import lombok.RequiredArgsConstructor;

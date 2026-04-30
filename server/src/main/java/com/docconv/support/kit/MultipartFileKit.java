@@ -1,7 +1,7 @@
-package com.docconv.converter.support.kit;
+package com.docconv.support.kit;
 
 import com.docconv.converter.dto.UploadFile;
-import com.docconv.converter.support.exception.Errors;
+import com.docconv.support.exception.Errors;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
